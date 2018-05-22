@@ -9,12 +9,14 @@
 	android:paddingTop="@dimen/activity_vertical_margin"
 	 >
 	
-	<TextView
+	<ImageView
 		android:id="@+id/title"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		android:scaleType="fitXY"
+		android:background="@color/colorAccent"
+		android:layout_width="200dp"
+		android:layout_height="100dp"
 		android:layout_centerHorizontal="true"
-		android:text="@string/display" />
+		 />
 	
 	<Button
 		android:id="@+id/go_btn"

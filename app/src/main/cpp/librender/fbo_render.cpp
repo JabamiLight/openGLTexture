@@ -43,6 +43,10 @@ void FboRender::render() {
     unsigned char buffers[_backingWidth*_backingHeight*4];
     glReadPixels(0,0,_backingWidth,_backingHeight,GL_RGBA,GL_UNSIGNED_BYTE,buffers);
     PngWrite pngWrite;
+    FILE* fp2=fopen("/mnt/sdcard/ic_launchergrayrgb.rgb","wb");
+    fwrite(buffers,_backingWidth*_backingHeight*4,1,fp2);
+    fclose(fp2);
+
     LOGI("start write png file");
     pngWrite.writePngFile("/mnt/sdcard/ic_launchergray.png", _backingWidth, _backingHeight,
                           (buffers));
