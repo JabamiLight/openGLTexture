@@ -6,9 +6,7 @@
 
 #define LOG_TAG "PicPreviewRender"
 
-enum {
-    ATTRIBUTE_VERTEX, ATTRIBUTE_TEXCOORD,
-};
+
 
 PicPreviewRender::PicPreviewRender(char *vertex, char *frag) {
     PIC_PREVIEW_FRAG_SHADER_2 = frag;
@@ -31,7 +29,7 @@ int PicPreviewRender::useProgram() {
         if (infoLen > 0) {
             char message[infoLen];
             glGetProgramInfoLog(program, infoLen, NULL, message);
-            LOGI("Error linking program : %s\n", message);
+            LOGE("Error linking program : %s\n", message);
         }
 
         glDeleteProgram(program);
@@ -58,7 +56,7 @@ GLuint PicPreviewRender::compileShader(GLenum type, const char *source) {
     GLint status;
     GLuint shader = glCreateShader(type);
     if (shader == 0 || shader == GL_INVALID_ENUM) {
-        LOGI("Failed to create shader %d", type);
+        LOGE("Failed to create shader %d", type);
         return 0;
     }
     glShaderSource(shader, 1, &source, NULL);
@@ -70,7 +68,7 @@ GLuint PicPreviewRender::compileShader(GLenum type, const char *source) {
         if (infoLen > 0) {
             char message[infoLen];
             glGetShaderInfoLog(shader, infoLen, NULL, message);
-            LOGI("Failed to compile shader : %s\n", message);
+            LOGE("Failed to compile shader : %s\n", message);
         }
 
         glDeleteShader(shader);
@@ -109,7 +107,12 @@ bool PicPreviewRender::init(int width, int height, PicPreviewTexture *picPreview
         return false;
     }
     ret = useProgram();
-    return false;
+    if(ret < 0){
+        LOGI("use program failed...");
+        this->dealloc();
+        return false;
+    }
+    return true;
 }
 
 void PicPreviewRender::render() {
@@ -120,18 +123,21 @@ void PicPreviewRender::render() {
     glClear(GL_COLOR_BUFFER_BIT);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
     glUseProgram(program);
     static const GLfloat _vertices[] = {-1.0f, 1.0f,//左上
                                         -1.0f, -1.0f,//左下
                                         1.0f, 1.0f,//右上
                                         1.0f, -1.0f//右下
     };
+    //stride设置为0自动决定步长
+    //设置定点缓存指针
     glVertexAttribPointer(ATTRIBUTE_VERTEX,2,GL_FLOAT,GL_FALSE,0,_vertices);
     glEnableVertexAttribArray(ATTRIBUTE_VERTEX);
     static const GLfloat texCoords[] = { 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f };
+    //设置纹理缓存指针，varying变量会被插值传入片元着色器
     glVertexAttribPointer(ATTRIBUTE_TEXCOORD, 2, GL_FLOAT, 0, 0, texCoords);
     glEnableVertexAttribArray(ATTRIBUTE_TEXCOORD);
+    //绑定纹理
     picPreviewTexture->bindTexture(uniformSampler);
     glDrawArrays(GL_TRIANGLE_STRIP,0,4);
 }

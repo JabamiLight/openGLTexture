@@ -3,12 +3,14 @@
 //
 
 #include "pic_preview_controller.h"
+#include "../libcommon/AssetsReader.h"
+#include "../librender/fbo_render.h"
+
 #define LOG_TAG "PicPreviewController"
 
 
-
 void *PicPreviewController::threadStartCallback(void *myself) {
-    PicPreviewController *controller = (PicPreviewController*) myself;
+    PicPreviewController *controller = (PicPreviewController *) myself;
     controller->renderLoop();
 //    pthread_exit(0);
     return nullptr;
@@ -52,16 +54,17 @@ bool PicPreviewController::initialize() {
     eglCore->init();
     previewSurface = eglCore->createWindowSurface(_window);
     eglCore->makeCurrent(previewSurface);
-
     picPreviewTexture = new PicPreviewTexture();
     bool createTexFlag = picPreviewTexture->createTexture();
-    if(!createTexFlag){
+
+    if (!createTexFlag) {
         LOGE("createTexFlag is failed...");
         destroy();
         return false;
     }
+
     updateTexImage();
-    bool isRendererInitialized = renderer->init(screenWidth, screenHeight, picPreviewTexture);
+    bool isRendererInitialized = render->init(screenWidth, screenHeight, picPreviewTexture);
     if (!isRendererInitialized) {
         LOGI("Renderer failed on initialized...");
         return false;
@@ -71,14 +74,19 @@ bool PicPreviewController::initialize() {
 }
 
 void PicPreviewController::updateTexImage() {
-        if (decoder) {
-            const RawImageData raw_image_data = decoder->getRawImageData();
-            LOGI("raw_image_data Meta: width is %d height is %d size is %d colorFormat is %d", raw_image_data.width, raw_image_data.height, raw_image_data.size,
-                 raw_image_data.gl_color_format);
-            LOGI("colorFormat is %d", GL_RGBA);
-            picPreviewTexture->updateTexImage((byte*) raw_image_data.data, raw_image_data.width, raw_image_data.height);
-            decoder->releaseRawImageData(&raw_image_data);
+    if (decoder) {
+        const RawImageData raw_image_data = decoder->getRawImageData();
+        LOGI("raw_image_data Meta: width is %d height is %d size is %d colorFormat is %d",
+             raw_image_data.width, raw_image_data.height, raw_image_data.size,
+             raw_image_data.gl_color_format);
+        LOGI("colorFormat is %d", GL_RGBA);
+        picPreviewTexture->updateTexImage((byte *) raw_image_data.data, raw_image_data.width,
+                                          raw_image_data.height);
+        if(type==1){
+            picPreviewTexture->createFramBuffer(raw_image_data.width, raw_image_data.height);
         }
+        decoder->releaseRawImageData(&raw_image_data);
+    }
 
 }
 
@@ -88,24 +96,24 @@ void PicPreviewController::drawFrame() {
         LOGE("eglSwapBuffers() returned error %d", eglGetError());
     }
 
+
 }
 
 void PicPreviewController::destroy() {
     LOGI("dealloc renderer ...");
-    if(nullptr!=render){
-        renderer->dealloc();
-        delete renderer;
-        renderer = NULL;
+    if (nullptr != render) {
+        render->dealloc();
+        delete render;
+        render = NULL;
     }
-    if(eglCore){
+    if (eglCore) {
         eglCore->releaseSurface(previewSurface);
         eglCore->release();
-        eglCore=NULL;
+        eglCore = NULL;
     }
     return;
 
 }
-
 
 
 PicPreviewController::~PicPreviewController() {
@@ -117,9 +125,9 @@ PicPreviewController::~PicPreviewController() {
 bool PicPreviewController::start(char *spriteFilePath) {
     LOGI("Creating VideoDutePlayerController thread");
     /*send message to render thread to stop rendering*/
-    decoder=new PngPicDecoder();
+    decoder = new PngPicDecoder();
     decoder->openFile(spriteFilePath);
-    pthread_create(&_threadId, nullptr,threadStartCallback,this);
+    pthread_create(&_threadId, nullptr, threadStartCallback, this);
     return true;
 }
 
@@ -138,8 +146,8 @@ void PicPreviewController::stop() {
 
 void PicPreviewController::setWindow(ANativeWindow *window) {
     pthread_mutex_lock(&mLock);
-    _msg=MSG_WINDOW_SET;
-    _window=window;
+    _msg = MSG_WINDOW_SET;
+    _window = window;
     pthread_cond_signal(&mCondition);
     pthread_mutex_unlock(&mLock);
 
@@ -151,18 +159,40 @@ void PicPreviewController::resetSize(int width, int height) {
     pthread_mutex_lock(&mLock);
     this->screenWidth = width;
     this->screenHeight = height;
-    renderer->resetRenderSize(0, 0, width, height);
+    render->resetRenderSize(0, 0, width, height);
     pthread_cond_signal(&mCondition);
     pthread_mutex_unlock(&mLock);
 }
 
-PicPreviewController::PicPreviewController(char *vertexContent, char *fragContent) {
-
+PicPreviewController::PicPreviewController(JNIEnv *env, jobject assetManager, int type) {
     LOGI("VideoDutePlayerController instance created");
     pthread_mutex_init(&mLock, nullptr);
     pthread_cond_init(&mCondition, nullptr);
-    render=new PicPreviewRender(vertexContent,fragContent);
-    screenWidth=720;
-    screenHeight=720;
-    decoder= nullptr;
+    screenWidth = 720;
+    screenHeight = 720;
+    this->type=type;
+    char *vertexContent = nullptr;
+    char *fragContent = nullptr;
+    if (type == 0) {
+        readSource(env, "texture/vertex_shader.glsl", "texture/fragment_shader.glsl",
+                   assetManager, vertexContent,
+                   fragContent);
+    } else {
+        readSource(env, "fbo/vertex_shader.glsl", "fbo/fragment_shader.glsl", assetManager,
+                   vertexContent,
+                   fragContent);
+    }
+    if (!vertexContent || !fragContent) {
+        LOGI("read source failed");
+        return;
+    }
+    LOGI("glsl content vertex %s", vertexContent);
+    LOGI("glsl content frag %s", fragContent);
+    if (type == 0) {
+        render = new PicPreviewRender(vertexContent, fragContent);
+    } else {
+        render = new FboRender(vertexContent, fragContent);
+
+    }
+    decoder = nullptr;
 }

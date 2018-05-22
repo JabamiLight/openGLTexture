@@ -15,14 +15,14 @@ public class PngPreviewActivity extends Activity {
 	private SurfaceView surfaceView;
 	private RelativeLayout preview_parent_layout;
 
-	private String picPath = "/mnt/sdcard/1.png";
+	private String picPath = "/mnt/sdcard/ic_launcher.png";
 	
 	private PngPreviewController pngPreviewController;
 	private Callback previewCallback = new Callback() {
 
 		public void surfaceCreated(SurfaceHolder holder) {
 			pngPreviewController = new PngPreviewController();
-			pngPreviewController.init(picPath,getAssets());
+			pngPreviewController.init(picPath,getAssets(),0);
 			pngPreviewController.setSurface(holder.getSurface());
 		}
 

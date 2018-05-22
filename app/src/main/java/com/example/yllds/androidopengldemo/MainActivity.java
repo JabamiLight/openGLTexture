@@ -10,9 +10,7 @@ import android.widget.Button;
 public class MainActivity extends Activity {
 
 
-	static {
-		System.loadLibrary("songstudio");
-	}
+
 	private Button go_btn;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

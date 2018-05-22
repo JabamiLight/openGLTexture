@@ -7,17 +7,16 @@
 
 #include "jni.h"
 #include "android/asset_manager_jni.h"
-
 #include "CommonTools.h"
 #define LOG_TAG "readSource"
 
-void mallocContent(AAsset *pAsset, char *content);
+void mallocContent(AAsset *pAsset, char *&content);
 
 void readSource(JNIEnv* env, const char* vertexFilePath,
                 const char* fragFilePath,
                 jobject assetManager,
-                char* vertexContent,
-                char* fragContent){
+                char*& vertexContent,
+                char*& fragContent){
 
     LOGI("ReadAssets");
     AAssetManager* mgr=AAssetManager_fromJava(env,assetManager);
@@ -42,9 +41,9 @@ void readSource(JNIEnv* env, const char* vertexFilePath,
     mallocContent(assetFrag,fragContent);
 }
 
-void mallocContent(AAsset *pAsset, char *content) {
+void mallocContent(AAsset *pAsset, char* &content) {
     off_t  bufferSize=AAsset_getLength(pAsset);
-    LOGI("file size         : %d\n",bufferSize);
+    LOGI("file size: %d\n",bufferSize);
     content=new char[bufferSize+1];
     content[bufferSize]=0;
     int numBytesRead=AAsset_read(pAsset,content,bufferSize);

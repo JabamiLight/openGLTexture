@@ -14,6 +14,9 @@
 
 class PicPreviewRender {
 protected:
+    enum {
+        ATTRIBUTE_VERTEX, ATTRIBUTE_TEXCOORD,
+    };
     char* PIC_PREVIEW_FRAG_SHADER_2;
     char* PIC_PREVIEW_VERTEX_SHADER_2;
     GLint _backingLeft;
@@ -39,7 +42,8 @@ public:
     virtual bool init(int width, int height, PicPreviewTexture* picPreviewTexture);
     virtual void render();
     virtual void dealloc();
-    void resetRenderSize(int left, int top, int width, int height);
+
+    virtual void resetRenderSize(int left, int top, int width, int height);
 };
 
 

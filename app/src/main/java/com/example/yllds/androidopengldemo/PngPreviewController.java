@@ -4,8 +4,11 @@ import android.content.res.AssetManager;
 import android.view.Surface;
 
 public class PngPreviewController {
+	static {
+		System.loadLibrary("native-lib");
+	}
 
-	public native void init(String picPath, AssetManager assetManager);
+	public native void init(String picPath, AssetManager assetManager,int type);
 
 	public native void setSurface(Surface surface);
 

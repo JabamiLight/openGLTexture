@@ -16,7 +16,7 @@
 class PicPreviewController {
 
 public:
-    PicPreviewController(char* vertexContent,char* fragContent);
+    PicPreviewController(JNIEnv*env,jobject assetManager,int type);
     virtual ~PicPreviewController();
     bool start(char* spriteFilePath);
     void stop();
@@ -24,6 +24,7 @@ public:
     void resetSize(int width, int height);
 
 private:
+    int type;
     PicPreviewRender* render;
     PicPreviewTexture* picPreviewTexture;
 

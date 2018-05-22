@@ -88,7 +88,7 @@ EGLSurface EGLCore::createWindowSurface(ANativeWindow *_window) {
     }
     //TODO 尝试不要
     ANativeWindow_setBuffersGeometry(_window, 0, 0, format);
-    if (!eglCreateWindowSurface(display, config, _window, 0)) {
+    if (!(surface=eglCreateWindowSurface(display, config, _window, 0))) {
         LOGE("eglCreateWindowSurface() returned error %d", eglGetError());
     }
     return surface;
@@ -106,7 +106,7 @@ EGLSurface EGLCore::createOffscreenSurface(int width, int height) {
 }
 
 bool EGLCore::makeCurrent(EGLSurface eglSurface) {
-    return eglMakeCurrent(display, eglSurface, eglSurface, context);
+    return static_cast<bool>(eglMakeCurrent(display, eglSurface, eglSurface, context));
 }
 
 void EGLCore::doneCurrent() {

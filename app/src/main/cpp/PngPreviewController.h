@@ -13,7 +13,7 @@ extern "C" {
  * Signature: (Ljava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_com_example_yllds_androidopengldemo_PngPreviewController_init
-  (JNIEnv *, jobject, jstring,jobject);
+  (JNIEnv *, jobject, jstring,jobject,jint);
 
 /*
  * Class:     com_example_yllds_androidopengldemo_PngPreviewController
