@@ -27,7 +27,10 @@ public class MainActivity extends Activity {
 			
 		});
 	}
-
 	
-
+	
+	public void goFbo(View view) {
+		Intent intent = new Intent(MainActivity.this, PngFboActivity.class);
+		startActivity(intent);
+	}
 }

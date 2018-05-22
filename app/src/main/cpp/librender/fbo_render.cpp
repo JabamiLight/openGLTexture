@@ -3,12 +3,16 @@
 //
 
 #include "fbo_render.h"
-
+#include "../libpng/png_write.h"
+#define LOG_TAG "FboRender"
 FboRender::FboRender(char *vertex, char *frag) : PicPreviewRender(vertex, frag) {}
 
 void FboRender::render() {
+    LOGI("render start");
     picPreviewTexture->bindFrameBuffer();
-
+    LOGE("glViewport pixel width %d height %d",_backingWidth,_backingHeight);
+    _backingWidth=96;
+    _backingHeight=96;
     glViewport(_backingLeft, _backingTop, _backingWidth, _backingHeight);
     //设置一个颜色状态
     glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
@@ -33,14 +37,16 @@ void FboRender::render() {
     //绑定纹理
     picPreviewTexture->bindTexture(uniformSampler);
     glDrawArrays(GL_TRIANGLE_STRIP,0,4);
+    LOGI("pixel width %d height %d",_backingWidth,_backingHeight);
+
+
+    unsigned char buffers[_backingWidth*_backingHeight*4];
     glReadPixels(0,0,_backingWidth,_backingHeight,GL_RGBA,GL_UNSIGNED_BYTE,buffers);
+    PngWrite pngWrite;
+    LOGI("start write png file");
+    pngWrite.writePngFile("/mnt/sdcard/ic_launchergray.png", _backingWidth, _backingHeight,
+                          (buffers));
     picPreviewTexture->dealloc();
+
 }
 
-void FboRender::resetRenderSize(int left, int top, int width, int height) {
-    PicPreviewRender::resetRenderSize(left, top, width, height);
-    if(this->buffers){
-        delete [] buffers;
-    }
-    buffers=new int[width*height];
-}

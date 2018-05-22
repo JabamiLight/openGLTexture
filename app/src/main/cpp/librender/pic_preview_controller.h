@@ -41,7 +41,7 @@ private:
 
     // android window, supported by NDK r5 and newer
     ANativeWindow* _window;
-    EGLCore* eglCore;
+    EGLCore* eglCore= nullptr;
     EGLSurface previewSurface;
 
     // Helper method for starting the thread

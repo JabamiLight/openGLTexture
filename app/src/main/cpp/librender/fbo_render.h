@@ -11,10 +11,6 @@ public:
     FboRender(char *vertex, char *frag);
     void render() override;
 
-    void resetRenderSize(int left, int top, int width, int height) override;
-
-private:
-    int* buffers;
 
 };
 

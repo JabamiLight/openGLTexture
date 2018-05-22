@@ -53,6 +53,7 @@ bool PicPreviewController::initialize() {
     eglCore = new EGLCore();
     eglCore->init();
     previewSurface = eglCore->createWindowSurface(_window);
+    LOGI("INIT previewsurface %d",previewSurface);
     eglCore->makeCurrent(previewSurface);
     picPreviewTexture = new PicPreviewTexture();
     bool createTexFlag = picPreviewTexture->createTexture();
@@ -192,7 +193,6 @@ PicPreviewController::PicPreviewController(JNIEnv *env, jobject assetManager, in
         render = new PicPreviewRender(vertexContent, fragContent);
     } else {
         render = new FboRender(vertexContent, fragContent);
-
     }
     decoder = nullptr;
 }

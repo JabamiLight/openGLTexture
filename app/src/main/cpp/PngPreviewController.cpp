@@ -16,7 +16,6 @@ void
 Java_com_example_yllds_androidopengldemo_PngPreviewController_init(JNIEnv *env, jobject thiz,
                                                                    jstring picPath,
                                                                    jobject assetManager,jint type) {
-
     controller = new PicPreviewController(env,assetManager,type);
     char* pngFilePath = (char*) env->GetStringUTFChars(picPath, NULL);
     LOGI("filepath %s",pngFilePath);

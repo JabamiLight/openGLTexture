@@ -167,4 +167,5 @@ void PicPreviewRender::resetRenderSize(int left, int top, int width, int height)
     this->_backingTop = top;
     this->_backingWidth = width;
     this->_backingHeight = height;
+
 }
