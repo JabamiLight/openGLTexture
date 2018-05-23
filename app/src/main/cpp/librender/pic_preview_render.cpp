@@ -17,7 +17,9 @@ int PicPreviewRender::useProgram() {
     program = glCreateProgram();
     glAttachShader(program, vertShader);
     glAttachShader(program, fragShader);
-    //绑定位置的几种方式
+    //可以直接调用这个方法进行绑定位置
+    //或者调用glGetAttribLocation()获取
+    //或者可以在glsl文件中直接指定(不是特比清楚是不是gles3才有的特性)
     glBindAttribLocation(program, ATTRIBUTE_VERTEX, "position");
     glBindAttribLocation(program, ATTRIBUTE_TEXCOORD, "texcoord");
     glLinkProgram(program);
@@ -152,7 +154,7 @@ void PicPreviewRender::render() {
 //    FILE* fp2=fopen("/mnt/sdcard/ic_launchergrayrgb.rgb","wb");
 //    fwrite(buffers1,_backingWidth*_backingHeight*4,1,fp2);
 //    fclose(fp2);
-    LOGI("start write png file");
+    LOGI("start writing png file");
     pngWrite.writePngFile("/mnt/sdcard/ic_launchergraynormal.png", width, height,
                           (buffers));
 }

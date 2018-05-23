@@ -22,12 +22,15 @@ bool PicPreviewTexture::createTexture() {
 int PicPreviewTexture::initTexture() {
     glGenTextures(1,&texture);
     glBindTexture(GL_TEXTURE_2D,texture);
+
+    //设置放大过滤为使用纹理中坐标最接近的若干个颜色，通过加权平均算法得到需要绘制的像素颜色
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    //设置缩小过滤为使用纹理中坐标最接近的一个像素的颜色作为需要绘制的像素颜色
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //将纹理s t轴的坐标都限制在0 - 1 的范围
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glBindTexture(GL_TEXTURE_2D,0);
-    glGenTextures(1,&textureFrame);
 
     return 1;
 }
@@ -53,8 +56,6 @@ PicPreviewTexture::~PicPreviewTexture() {
 
 void PicPreviewTexture::updateTexImage(byte *pixel, int width, int height) {
     if(pixel){
-        //TODO cancel
-        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D,texture);
         if(checkGlError("glBindTexture ")){
             return;
@@ -101,6 +102,7 @@ bool PicPreviewTexture::createFramBuffer() {
     glBindRenderbuffer(GL_RENDERBUFFER,render);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, width);
     glBindRenderbuffer(GL_RENDERBUFFER,0);
+    glGenTextures(1,&textureFrame);
     glBindTexture(GL_TEXTURE_2D,textureFrame);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

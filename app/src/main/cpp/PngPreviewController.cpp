@@ -19,7 +19,6 @@ Java_com_example_yllds_androidopengldemo_PngPreviewController_init(JNIEnv *env, 
     controller = new PicPreviewController(env,assetManager,type);
     char* pngFilePath = (char*) env->GetStringUTFChars(picPath, NULL);
     LOGI("filepath %s",pngFilePath);
-
     controller->start(pngFilePath);
     env->ReleaseStringUTFChars(picPath, pngFilePath);
 }

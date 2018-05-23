@@ -25,7 +25,7 @@
 		android:layout_below="@id/title"
 		android:layout_centerHorizontal="true"
 		android:layout_marginTop="10dp"
-		android:text="@string/go" />
+		android:text="go_texture" />
 	<Button
 		android:onClick="goFbo"
 		android:layout_width="wrap_content"
@@ -33,6 +33,6 @@
 		android:layout_below="@id/go_btn"
 		android:layout_centerHorizontal="true"
 		android:layout_marginTop="10dp"
-		android:text="@string/go" />
+		android:text="go_fbo" />
 
 </RelativeLayout>
