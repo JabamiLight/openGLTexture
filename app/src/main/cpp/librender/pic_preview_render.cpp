@@ -3,9 +3,9 @@
 //
 
 #include "pic_preview_render.h"
+#include "../libpng/png_write.h"
 
 #define LOG_TAG "PicPreviewRender"
-
 
 
 PicPreviewRender::PicPreviewRender(char *vertex, char *frag) {
@@ -107,7 +107,7 @@ bool PicPreviewRender::init(int width, int height, PicPreviewTexture *picPreview
         return false;
     }
     ret = useProgram();
-    if(ret < 0){
+    if (ret < 0) {
         LOGI("use program failed...");
         this->dealloc();
         return false;
@@ -116,6 +116,7 @@ bool PicPreviewRender::init(int width, int height, PicPreviewTexture *picPreview
 }
 
 void PicPreviewRender::render() {
+
     glViewport(_backingLeft, _backingTop, _backingWidth, _backingHeight);
     //设置一个颜色状态
     glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
@@ -131,15 +132,29 @@ void PicPreviewRender::render() {
     };
     //stride设置为0自动决定步长
     //设置定点缓存指针
-    glVertexAttribPointer(ATTRIBUTE_VERTEX,2,GL_FLOAT,GL_FALSE,0,_vertices);
+    glVertexAttribPointer(ATTRIBUTE_VERTEX, 2, GL_FLOAT, GL_FALSE, 0, _vertices);
     glEnableVertexAttribArray(ATTRIBUTE_VERTEX);
-    static const GLfloat texCoords[] = { 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f };
+    static const GLfloat texCoords[] = {0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f};
     //设置纹理缓存指针，varying变量会被插值传入片元着色器
     glVertexAttribPointer(ATTRIBUTE_TEXCOORD, 2, GL_FLOAT, 0, 0, texCoords);
     glEnableVertexAttribArray(ATTRIBUTE_TEXCOORD);
     //绑定纹理
     picPreviewTexture->bindTexture(uniformSampler);
-    glDrawArrays(GL_TRIANGLE_STRIP,0,4);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    //超过glViewport的区域不会报错，但是生成带图片会混乱
+    //小于则是读取一部分的矩形区域
+    int width=_backingWidth;
+    int height=_backingHeight;
+    unsigned char *buffers = new unsigned char[_backingHeight * _backingWidth * 4];
+    glReadPixels(0, 0, _backingWidth, _backingHeight, GL_RGBA, GL_UNSIGNED_BYTE, buffers);
+    LOGI("读取数据成功");
+    PngWrite pngWrite;
+//    FILE* fp2=fopen("/mnt/sdcard/ic_launchergrayrgb.rgb","wb");
+//    fwrite(buffers1,_backingWidth*_backingHeight*4,1,fp2);
+//    fclose(fp2);
+    LOGI("start write png file");
+    pngWrite.writePngFile("/mnt/sdcard/ic_launchergraynormal.png", width, height,
+                          (buffers));
 }
 
 void PicPreviewRender::dealloc() {

@@ -6,6 +6,7 @@
 #define LOG_TAG "PicPreviewTexture"
 
 
+
 bool PicPreviewTexture::createTexture() {
     LOGI("enter PicPreviewTexture::createTexture");
     texture=0;
@@ -26,6 +27,8 @@ int PicPreviewTexture::initTexture() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glBindTexture(GL_TEXTURE_2D,0);
+    glGenTextures(1,&textureFrame);
+
     return 1;
 }
 
@@ -89,14 +92,24 @@ void PicPreviewTexture::dealloc() {
 
 }
 
-bool PicPreviewTexture::createFramBuffer(const int width, const int height) {
+bool PicPreviewTexture::createFramBuffer() {
+    const int width = 720;
+    //fbo绑定的每个缓冲需要有想同的样本数，应该就是宽高乘积的数量了，反应的内存大小，否则后面读取像素
+    //会全部为0
     glGenFramebuffers(1,&frame);
     glGenRenderbuffers(1,&render);
     glBindRenderbuffer(GL_RENDERBUFFER,render);
-    glRenderbufferStorage(GL_RENDERBUFFER,GL_DEPTH_COMPONENT16,width,height);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, width);
     glBindRenderbuffer(GL_RENDERBUFFER,0);
+    glBindTexture(GL_TEXTURE_2D,textureFrame);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, width, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glBindTexture(GL_TEXTURE_2D,0);
     glBindFramebuffer(GL_FRAMEBUFFER,frame);
-    glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,texture,0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,textureFrame,0);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,GL_RENDERBUFFER,render);
     // check FBO status
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);

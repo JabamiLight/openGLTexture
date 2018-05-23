@@ -37,14 +37,12 @@ public class MainActivity extends Activity {
 		});
 		try {
 			FileInputStream is=new FileInputStream("/mnt/sdcard/ic_launchergrayrgb.rgb");
-			byte[] bytes=new byte[96*96*4];
+			byte[] bytes=new byte[720*720*4];
 			is.read(bytes);
 			is.close();
 			ByteBuffer bytebuffer = ByteBuffer.wrap(bytes);
-			int[] rgb=new int[96*96];
-			bytebuffer.asIntBuffer().get(rgb);
-			Bitmap b= Bitmap.createBitmap(rgb,96,96, Bitmap.Config.ARGB_8888);
-			
+			Bitmap b= Bitmap.createBitmap(720,720, Bitmap.Config.ARGB_8888);
+			b.copyPixelsFromBuffer(bytebuffer);
 			tv.setImageBitmap(b);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

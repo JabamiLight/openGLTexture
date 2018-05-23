@@ -84,7 +84,7 @@ void PicPreviewController::updateTexImage() {
         picPreviewTexture->updateTexImage((byte *) raw_image_data.data, raw_image_data.width,
                                           raw_image_data.height);
         if(type==1){
-            picPreviewTexture->createFramBuffer(raw_image_data.width, raw_image_data.height);
+            picPreviewTexture->createFramBuffer();
         }
         decoder->releaseRawImageData(&raw_image_data);
     }
@@ -96,6 +96,7 @@ void PicPreviewController::drawFrame() {
     if (!eglCore->swapBuffers(previewSurface)) {
         LOGE("eglSwapBuffers() returned error %d", eglGetError());
     }
+
 
 
 }

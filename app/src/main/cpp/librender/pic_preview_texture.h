@@ -12,6 +12,7 @@
 class PicPreviewTexture {
 private:
     GLuint  texture;
+    GLuint  textureFrame;
     GLuint  frame;
     GLuint  render;
     int initTexture();
@@ -26,7 +27,7 @@ public:
     void updateTexImage(byte* pixel,int width,int height);
     bool bindTexture(GLint uniformaSampler);
     void dealloc();
-    bool createFramBuffer(const int width, const int height);
+    bool createFramBuffer();
     bool bindFrameBuffer();
 
 };
