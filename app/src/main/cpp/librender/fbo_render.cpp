@@ -11,11 +11,11 @@ FboRender::FboRender(char *vertex, char *frag) : PicPreviewRender(vertex, frag) 
 
 void FboRender::render() {
     LOGI("render start");
+    _backingWidth=720;
+    _backingHeight=720;
     picPreviewTexture->bindFrameBuffer();
     LOGE("glViewport pixel width %d height %d", _backingWidth, _backingHeight);
     //大于fbo的缓冲样本数读取像素会出问题<=720
-    _backingWidth=500;
-    _backingHeight=500;
     glViewport(_backingLeft, _backingTop, _backingWidth, _backingHeight);
 //    _backingWidth=96;
 //    _backingHeight=96;
@@ -43,21 +43,26 @@ void FboRender::render() {
     //绑定纹理
     picPreviewTexture->bindTexture(uniformSampler);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    LOGI("pixel width %d height %d", _backingWidth, _backingHeight);
+//    glBindFramebuffer(GL_FRAMEBUFFER,0);
+//    glClearColor(0.0f, 0.0f, 1.0f, 1.0f); // set clear color to white (not really necessery actually, since we won't be able to see behind the quad anyways)
+//    glClear(GL_COLOR_BUFFER_BIT);
+//    picPreviewTexture->bindTextureFrame(uniformSampler);
+//    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+//    LOGI("pixel width %d height %d", _backingWidth, _backingHeight);
     //超过glViewport的区域不会报错，但是生成带图片会混乱
     //小于则是读取一部分的矩形区域
-    int width=_backingWidth;
-    int height=_backingHeight;
-    unsigned char *buffers = new unsigned char[width * height * 4];
-    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffers);
-    PngWrite pngWrite;
+//    int width=_backingWidth;
+//    int height=_backingHeight;
+//    unsigned char *buffers = new unsigned char[width * height * 4];
+//    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffers);
+//    PngWrite pngWrite;
 //    FILE* fp2=fopen("/mnt/sdcard/ic_launchergrayrgb.rgb","wb");
 //    fwrite(buffers,_backingWidth*_backingHeight*4,1,fp2);
 //    fclose(fp2);
-    LOGI("start write png file");
-    pngWrite.writePngFile("/mnt/sdcard/ic_launchergray.png", width, height,
-                          (buffers));
-    delete[]buffers;
-    picPreviewTexture->dealloc();
+//    LOGI("start write png file");
+//    pngWrite.writePngFile("/mnt/sdcard/ic_launchergray.png", width, height,
+//                          (buffers));
+//    delete[]buffers;
+//    picPreviewTexture->dealloc();
 }
 
