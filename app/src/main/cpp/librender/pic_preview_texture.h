@@ -30,6 +30,7 @@ public:
     bool createFramBuffer();
     bool bindFrameBuffer();
 
+    bool bindTextureFrame(GLuint i);
 };
 
 

@@ -127,3 +127,14 @@ bool PicPreviewTexture::bindFrameBuffer() {
     glBindFramebuffer(GL_FRAMEBUFFER,frame);
     return true;
 }
+
+bool PicPreviewTexture::bindTextureFrame(GLuint uniformaSampler) {
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D,textureFrame);
+    if (checkGlError("glBindTexture 111")) {
+        return false;
+    }
+    glUniform1i(uniformaSampler,0);
+    return true;
+
+}
